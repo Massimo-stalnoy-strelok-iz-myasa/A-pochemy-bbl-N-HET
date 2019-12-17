@@ -9,7 +9,7 @@ from PyQt5 import uic
 class Test(QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('untitled.ui', self)
+        uic.loadUi('UI.ui', self)
 
         self.pushButton.clicked.connect(self.circle)
 
