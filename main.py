@@ -1,43 +1,46 @@
-import sys
-from PyQt5.QtWidgets import QWidget, QApplication, QMainWindow, QLabel, QGridLayout
-from PyQt5.QtGui import QPainter, QPixmap, QPen, QColor
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 from random import randint
-from PyQt5 import uic
 
 
-class Test(QMainWindow):
+class Widget(QWidget):
     def __init__(self):
         super().__init__()
-        uic.loadUi('UI.ui', self)
+        self.setWindowTitle('Paint point example')
+        self.point = None
+    def mousePressEvent(self, event):
+        self.point = event.pos()
 
-        self.pushButton.clicked.connect(self.circle)
+        # Вызов перерисовки виджета
+        self.update()
 
-        self.label = QLabel()
-        canvas = QPixmap(600, 600)
-        self.label.setPixmap(canvas)
+    def mouseReleaseEvent(self, event):
+        self.point = None
 
-        layout = QGridLayout(self.centralwidget)
-        layout.addWidget(self.pushButton, 0, 0, alignment=Qt.AlignCenter)
-        layout.addWidget(self.label, 1, 0)
+    def paintEvent(self, event):
+        super().paintEvent(event)
 
-    def circle(self):
-        x, y = [randint(10, 500) for i in range(2)]
-        w, h = [randint(10, 100) for i in range(2)]
-        # создаем экземпляр QPainter, передавая холст (self.label.pixmap())
-        painter = QPainter(self.label.pixmap())
+        # Если нет
+        if not self.point:
+            return
+
+        # Рисовать будем на самом себе
+        painter = QPainter(self)
+
+        # Для рисования точки хватит setPen, но для других фигур (типо rect) понадобится setBrush
         pen = QPen()
         pen.setWidth(3)
-        pen.setColor(QColor(255, 255, 0))
+        pen.setColor(QColor(*[randint(0, 255) for i in range(3)]))
         painter.setPen(pen)
+        # Рисование точки
+        x, y = [randint(10, 500) for i in range(2)]
+        w, h = [randint(10, 100) for i in range(2)]
         painter.drawEllipse(x, y, w, w)
-        painter.end()
-        self.update()
 
 
 if __name__ == '__main__':
-    import sys
-    app = QApplication(sys.argv)
-    w = Test()
+    app = QApplication([])
+    w = Widget()
     w.show()
-    sys.exit(app.exec_())
+    app.exec()
